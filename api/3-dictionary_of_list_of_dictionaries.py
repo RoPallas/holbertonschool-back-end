@@ -2,33 +2,28 @@
 """Script for API request"""
 import json
 import requests
-import sys
 
 
 if __name__ == "__main__":
-    """
-    Given employee ID, returns information about his/her todo list
-    progress.
-    """
-    u_id = sys.argv[1]
 
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(u_id)
-    response = requests.get(user_url)
-    user_data = response.json()
+    emp_user = requests.get(
+        f'https://jsonplaceholder.typicode.com/users/').json()
+    todo_response = requests.get(
+        f'https://jsonplaceholder.typicode.com/todos').json()
 
-    t_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(u_id)
-    response = requests.get(t_url)
-    tasks_data = response.json()
+    user_to_dict = {}
+    file_name = "todo_all_employees.json"
 
-    user_tasks = {str(u_id): []}
+    for user in emp_user:
+        id = user.get("id")
+        user_to_dict[id] = []
+        for task in todo_response:
+            if user.get("id") == task.get("userId"):
+                user_to_dict[id].append({
+                    "username": user.get("username"),
+                    "task": task.get("title"),
+                    "completed": task.get("completed")
+                })
 
-    for task in tasks_data:
-        task_data = {
-            "username": user_data["username"],
-            "task": task["title"],
-            "completed": task["completed"]
-        }
-        user_tasks[str(u_id)].append(task_data)
-
-    with open("todo_all_employees.json", "a") as json_file:
-        json.dump(user_tasks, json_file)
+    with open(file_name, "w", encoding="utf-8") as file:
+        json.dump(user_to_dict, file, indent=4)
