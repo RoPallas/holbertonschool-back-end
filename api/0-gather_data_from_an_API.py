@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""Script for API request"""
 import requests
 import sys
 
